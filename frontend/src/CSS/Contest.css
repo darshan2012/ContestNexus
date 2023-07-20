@@ -1,0 +1,29 @@
+.contest-card {
+    width: 300px;
+  }
+  
+  .contest-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .platform-logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+  
+  .platform-name {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .contest-details {
+    margin-top: 10px;
+  }
+  
+  .detail-label {
+    font-weight: bold;
+  }
+  

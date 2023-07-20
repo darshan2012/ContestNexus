@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react';
+import { Outlet, BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
+import Header from './components/Header';
+import { Box, ChakraProvider,Link as LogoLink } from '@chakra-ui/react';
+import ContestScreen from './screens/ContestScreen';
+import Footer from './components/Footer';
+import HomeScreen from './screens/HomeScreen';
+import LoginScreen from './screens/LoginScreen.jsx';
+import RegisterScreen from './screens/RegisterScreen.jsx';
+import EmailVerifyScreen from './screens/EmailVerifyScreen.jsx';
+import NotFoundPage from './components/NotFoundPage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const location = window.location.pathname;
 
+  const [showLogo,setShowLogo] = useState(location.includes('/users/'));
+  useEffect(()=>{setShowLogo(location.includes('/users/'))},[window.location.pathname]);
+  // console.log(isEmailVerifyScreen);
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    {/* <IDEScreen /> */}
+    <ChakraProvider>
+      <Router>
+        {!showLogo?  <Header /> :<Box float={'left'} ><LogoLink href={"/home"}><h1>logo</h1></LogoLink></Box>}
+        {/* <UserComponent /> */}
+        <Routes>
+        <Route path="/" element={<HomeScreen />} />
+          <Route index path={"/home"} element={<HomeScreen />} />
+          <Route path="/users/login" element={<LoginScreen />} />
+          <Route path="/users/register" element={<RegisterScreen />} />
+          <Route path="/contests" element={<ContestScreen />} />
+          {/* <Route path='/contact' /> */}
+          <Route path='/*' element={<NotFoundPage />} />
+        </Routes>
+
+        <ToastContainer />
+        {/* <Container className="my-2">
+          <Outlet />
+        </Container> */}
+        {!showLogo && <Footer />}
+      </Router>
+    </ChakraProvider>
+</>
+  );
 }
 
-export default App
+
+
+
+export default App;
