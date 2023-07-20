@@ -12,17 +12,20 @@ const sendMail = require('../utils/sendMail');
  */
 exports.signupUser = async (req, res) => {
     console.log(req.body);  
-    const { username, email, password, id, method } = req.body;
+    const { username,firstname,lastname, email, password, id, method } = req.body;
     try {
         let userbymail = await userSchema.findOne({ email: email });
         let userbyname = await userSchema.findOne({ username: username });
         if (userbymail) {
+            
             return sendResponse("User with email already exist!", res, 409);
         } else if (userbyname) {
             return sendResponse("User with this username already exist!", res, 409);
         }
         user = new userSchema({
             username: username,
+            firsname: firstname,
+            lastname: lastname,
             email: email,
             active: method.toLowerCase() !== "local",
             method: method.toLowerCase()
@@ -42,13 +45,14 @@ exports.signupUser = async (req, res) => {
         // return sendResponse("User created successfully", res, 200);
         const jwtToken = generateToken(user);
         if (method === "local") {
+            
             const encodedToken = Buffer.from(jwtToken).toString('base64url');
 
             await userSchema.findByIdAndUpdate(user._id, { mailToken: jwtToken });
             const url =  process.env.CLIENT_HOST +"users/" + user.username + "/verifyemail/" + encodedToken;
             console.log(url + "\n" + jwtToken);
             try{
-                
+            
                 sendMail(user.email, "Verify your email!", "confirm-email", user.username, url);
             }
             catch(error)

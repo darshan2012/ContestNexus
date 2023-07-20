@@ -15,8 +15,8 @@ import NotFoundPage from './components/NotFoundPage';
 function App() {
   const location = window.location.pathname;
 
-  const [showLogo,setShowLogo] = useState(location.includes('/users/'));
-  useEffect(()=>{setShowLogo(location.includes('/users/'))},[window.location.pathname]);
+  const showLogo = location.includes('/users/');
+  
   // console.log(isEmailVerifyScreen);
   return (
     <>
@@ -32,6 +32,7 @@ function App() {
           <Route path="/users/register" element={<RegisterScreen />} />
           <Route path="/contests" element={<ContestScreen />} />
           {/* <Route path='/contact' /> */}
+          <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen />} />
           <Route path='/*' element={<NotFoundPage />} />
         </Routes>
 

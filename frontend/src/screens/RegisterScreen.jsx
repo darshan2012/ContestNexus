@@ -56,17 +56,23 @@ export default function RegisterScreen() {
   
     try {
       const response = await axios.post('http://localhost:4000/auth/signup', formData);
+      console.log(response);
       if (response.status === 200) {
         setVerificationEmailSent(true);
+      } 
+      else if(response.status === 409)
+      {
+        setBackendError(response.err);
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setBackendError(error.response.data.message);
-      } else {
+      console.log(error)
+      if (error.response && error.response.data && error.response.data.err) {
+        setBackendError(error.response.data.err);
+      }
+      else {
         setBackendError('An error occurred. Please try again.');
       }
     }
-  
     setIsLoading(false);
   };
   

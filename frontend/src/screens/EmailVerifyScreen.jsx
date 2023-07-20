@@ -5,6 +5,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 // import success from "../../images/success.png";
 import  "../CSS/email-verify.css";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 // import { Fragment } from "react/cjs/react.production.min";
 
 const EmailVerifyScreen = () => {
@@ -31,7 +32,8 @@ const EmailVerifyScreen = () => {
 		<Fragment>
 			{validUrl ? (
 				<div className={"container"}>
-					<img src={success} alt="success_img" className={"success_img"} />
+					<CheckCircleIcon />
+					{/* <img src={success} alt="success_img" className={"success_img"} /> */}
 					<h1>Email verified successfully</h1>
 					<Link to="/users/login">
 						<button className={"green_btn"}>Login</button>

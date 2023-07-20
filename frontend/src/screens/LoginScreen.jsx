@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Flex,
   Box,
@@ -11,19 +12,21 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [method,setMethod] = useState('local');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [backendError, setBackendError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUsingEmail, setIsUsingEmail] = useState(true);
   const navigate = useNavigate();
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleIdentifierChange = (e) => {
+    setIdentifier(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -34,26 +37,41 @@ export default function LoginScreen() {
     setRememberMe((prevValue) => !prevValue);
   };
 
+  const handleLoginTypeChange = () => {
+    setIsUsingEmail((prevValue) => !prevValue);
+    setBackendError('');
+    setIdentifier('');
+    setPassword('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBackendError('');
+    setIsLoading(true); // Start loading state
 
     try {
-      const response = await axios.post('http://localhost:4000/auth/login', { email, password });
-      
-      const { token } = response.data;
+      const loginData = isUsingEmail
+        ? { email: identifier, password, method }
+        : { username: identifier, password, method };
+      const response = await axios.post('http://localhost:4000/auth/signin', loginData);
 
-      // Store JWT token in local storage
-      localStorage.setItem('token', token);
-
-      // Redirect to the homepage
-      navigate('/');
+      if (response.status === 200) {
+        console.log(response.data);
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        navigate('/');
+        window.location.reload(); // This will force a page refresh
+      } 
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setBackendError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.err) {
+        console.log("Error:", error);
+        setBackendError(error.response.data.err);
       } else {
+        console.log(error);
         setBackendError('An error occurred. Please try again.');
       }
+    } finally {
+      setIsLoading(false); // End loading state after API call is completed
     }
   };
 
@@ -74,9 +92,9 @@ export default function LoginScreen() {
         <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
-              <FormControl id="email" isRequired>
-                <FormLabel>Email address</FormLabel>
-                <Input type="email" value={email} onChange={handleEmailChange} />
+              <FormControl id="identifier" isRequired>
+                <FormLabel>{isUsingEmail ? 'Email address' : 'Username'}</FormLabel>
+                <Input type={isUsingEmail ? 'email' : 'text'} value={identifier} onChange={handleIdentifierChange} />
               </FormControl>
               <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>
@@ -96,6 +114,8 @@ export default function LoginScreen() {
                   _hover={{
                     bg: 'blue.500',
                   }}
+                  isLoading={isLoading}
+                  loadingText="Signing in..."
                 >
                   Sign in
                 </Button>

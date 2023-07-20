@@ -3,5 +3,6 @@ module.exports = (message, res, errorCode = 200) => {
         console.log(errorCode, message);
         return res.status(errorCode).send({ result: message });
     }
+    console.log(errorCode, message);
     res.status(errorCode).send({ err: message });
 };
