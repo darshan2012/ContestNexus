@@ -8,6 +8,7 @@ module.exports = (req, res, next) => {
         jwt.verify(token, process.env.SECRETKEY);
         next();
     } catch (error) {
+        console.log("here");
         res.status(401).json({ message: "Authentication failed!" });
     }
 };

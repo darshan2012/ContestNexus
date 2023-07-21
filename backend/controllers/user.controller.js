@@ -4,29 +4,39 @@ const userSchema = require('../models/user.model');
 const sendResponse = require('../utils/sendResponse');
 const generateToken = require('../utils/generateToken');
 const sendMail = require('../utils/sendMail');
-
+const axios = require('axios')
 /**
  * POST
  * @param {username, email, password, id(for google auth), method} req 
  * @param {*} res 
  */
+exports.getUser = async (req, res) => {
+    const token = req.headers.authorization.split(" ")[1];
+    const user = await userSchema.findOne({ mailToken: token });
+    if (user) {
+        sendResponse(user, res, 200);
+    }
+    else
+        sendResponse("Unauthorized", res, 401);
+}
+
 exports.signupUser = async (req, res) => {
-    console.log(req.body);  
-    const { username,firstname,lastname, email, password, id, method } = req.body;
+    console.log(req.body);
+    const { username, firstname, lastname, email, password,handles, id, method } = req.body;
     try {
         let userbymail = await userSchema.findOne({ email: email });
         let userbyname = await userSchema.findOne({ username: username });
         if (userbymail) {
-            
             return sendResponse("User with email already exist!", res, 409);
         } else if (userbyname) {
             return sendResponse("User with this username already exist!", res, 409);
         }
         user = new userSchema({
             username: username,
-            firsname: firstname,
+            firstname: firstname,
             lastname: lastname,
             email: email,
+            handles: handles,
             active: method.toLowerCase() !== "local",
             method: method.toLowerCase()
         });
@@ -45,18 +55,17 @@ exports.signupUser = async (req, res) => {
         // return sendResponse("User created successfully", res, 200);
         const jwtToken = generateToken(user);
         if (method === "local") {
-            
+
             const encodedToken = Buffer.from(jwtToken).toString('base64url');
 
             await userSchema.findByIdAndUpdate(user._id, { mailToken: jwtToken });
-            const url =  process.env.CLIENT_HOST +"users/" + user.username + "/verifyemail/" + encodedToken;
+            const url = process.env.CLIENT_HOST + "users/" + user.username + "/verifyemail/" + encodedToken;
             console.log(url + "\n" + jwtToken);
-            try{
-            
+            try {
+
                 sendMail(user.email, "Verify your email!", "confirm-email", user.username, url);
             }
-            catch(error)
-            {
+            catch (error) {
                 console.log(error + " here");
             }
             return sendResponse('Email successfully sent', res, 200);
@@ -67,12 +76,12 @@ exports.signupUser = async (req, res) => {
                 userData: user,
                 expiresIn: 86400,
             }
-            return sendResponse("User created successfully", res, 200);
+            return sendResponse(resObj, res, 200);
 
         }
 
     } catch (error) {
-        console.log(error+ " eroro")
+        // console.log(error + " eroro")
         return sendResponse(error, res, 500);
     }
 
@@ -87,9 +96,9 @@ exports.loginUser = async (req, res) => {
     const { username, email, password, method, id } = req.body;
     try {
         let user;
-        if(!username) {
+        if (!username) {
             user = await userSchema.findOne({ email });
-        }else{
+        } else {
             user = await userSchema.findOne({ username });
         }
         if (!user) {
@@ -130,7 +139,6 @@ exports.loginUser = async (req, res) => {
     } catch (err) {
         return sendResponse(err, res, 500);
     }
-
 }
 
 /**
@@ -140,22 +148,22 @@ exports.loginUser = async (req, res) => {
  */
 exports.verifyEmail = async (req, res) => {
     const username = req.params.username;
-    
+
     const getToken = req.body.token;
     const decodedToken = Buffer.from(getToken, 'base64url').toString();
-    console.log("old " + getToken + " new " + decodedToken);
-    console.log(getToken);
+    // console.log("old " + getToken + " new " + decodedToken);
+    // console.log(getToken);
     try {
         const ok = jwt.verify(decodedToken, process.env.SECRETKEY);
         if (ok) {
             let user = await userSchema.findOne({ username: username });
-            if(user.mailToken === decodedToken)
-            if (user) {
-                user.mailToken = '';
-                user.active = true;
-                await user.save();
-                return sendResponse('Account Email Confirmed!', res);
-            } 
+            if (user.mailToken === decodedToken)
+                if (user) {
+                    user.mailToken = '';
+                    user.active = true;
+                    await user.save();
+                    return sendResponse('Account Email Confirmed!', res);
+                }
             return sendResponse('Account Activation Failed', res, 401);
         } else {
             return sendResponse('Invalid activation requested! Kindly follow url sent in mail!', res, 401);
@@ -216,7 +224,7 @@ exports.resetPassword = async (req, res) => {
 exports.updateUser = async (req, res) => {
     const { username, fullname, bio } = req.body;
     try {
-        let user = await userSchema.findOne({ username: username});
+        let user = await userSchema.findOne({ username: username });
         if (!user) {
             return sendResponse("User with this username does not exist!", res, 404);
         }
@@ -229,25 +237,25 @@ exports.updateUser = async (req, res) => {
     }
 }
 
-exports.getUserInfo = async(req, res) => {
-    const {username} = req.body;
+exports.getUserInfo = async (req, res) => {
+    const { username } = req.body;
     try {
-        let  user = await userSchema.findOne({username: username});
-        if(!user) {
+        let user = await userSchema.findOne({ username: username });
+        if (!user) {
             return sendResponse("User with this username does not exist!", res, 404);
         }
         var data = {
-            'fullName':  user.fullName,
+            'fullName': user.fullName,
             'bio': user.bio,
             'email': user.email
         };
         JSON.parse(JSON.stringify(data));
-        return sendResponse(data,res);
-    }catch(err) {
-        return sendResponse(err,res,500);
+        return sendResponse(data, res);
+    } catch (err) {
+        return sendResponse(err, res, 500);
     }
 }
-exports.getAllUsernames = async (req, res) => { 
+exports.getAllUsernames = async (req, res) => {
     let userMap = {};
     let users = await userSchema.find({});
 
@@ -260,14 +268,82 @@ exports.getAllUsernames = async (req, res) => {
 
     sendResponse(userMap, res);
 }
+
+exports.getLeetcodeData = async (req, res) => {
+    const username = req.params.username;
+    const user = await userSchema.findOne({ username: username });
+    if (user) {
+        const handle = user.handles.leetcodeHandle; // Replace with the desired Codeforces username
+        if (handle) {
+            try {
+                // Fetch user's Codeforces data
+                const query = `
+                {
+                  matchedUser(username: "${username}") {
+                    username
+                    submitStats: submitStatsGlobal {
+                      acSubmissionNum {
+                        difficulty
+                        count
+                        submissions
+                      }
+                    }
+                  }
+                }
+              `;
+
+                const response = await axios.post('https://leetcode.com/graphql', { query });
+                const leetCodeData = response.data.data.matchedUser;
+
+                sendResponse(leetCodeData, res, 200);
+            } catch (error) {
+                console.error(error);
+                sendResponse('An error occurred while fetching data from LeetCode API', res, 500);
+            }
+        }
+        else
+            sendResponse('handle does not exist', res, 404);
+    }
+    else
+        sendResponse('user does not exist', res, 404);
+
+}
+
+exports.getCodeforcesData = async (req, res) => {
+    const username = req.params.username;
+    const user = await userSchema.findOne({ username: username });
+    if (user) {
+        const handle = user.handles.codeforcesHandle; // Replace with the desired Codeforces username
+        if (handle) {
+            try {
+                // Fetch user's Codeforces data
+                const response = await axios.get(`https://codeforces.com/api/user.info?handles=${handle}`);
+                const codeforcesData = response.data.result[0];
+                console.log(userInfo)
+
+                sendResponse(codeforcesData, res, 200);
+
+
+            } catch (error) {
+                console.error(error);
+                sendResponse('An error occurred while fetching data from Codeforces API', res, 500);
+            }
+        }
+        else
+            sendResponse('handle does not exist', res, 404);
+    }
+    else
+        sendResponse('user does not exist', res, 404);
+};
+
 exports.saveCode = async (req, res) => {
 
 }
 
 exports.deleteCode = async (req, res) => {
-    
+
 }
 
 exports.saveConfig = async (req, res) => {
-        
+
 }

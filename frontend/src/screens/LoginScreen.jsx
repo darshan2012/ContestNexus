@@ -48,20 +48,26 @@ export default function LoginScreen() {
     e.preventDefault();
     setBackendError('');
     setIsLoading(true); // Start loading state
-
+  
     try {
-      const loginData = isUsingEmail
-        ? { email: identifier, password, method }
-        : { username: identifier, password, method };
-      const response = await axios.post('http://localhost:4000/auth/signin', loginData);
-
+      // Check if the user entered an email or a username
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+  
+      let loginData;
+      if (isEmail) {
+        loginData = { email: identifier, password, method };
+      } else {
+        loginData = { username: identifier, password, method };
+      }
+  
+      const response = await axios.post('http://localhost:4000/users/signin', loginData);
+  
       if (response.status === 200) {
-        console.log(response.data);
-        const { token } = response.data;
+        const token = response.data.result.token;
         localStorage.setItem('token', token);
         navigate('/');
         window.location.reload(); // This will force a page refresh
-      } 
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.err) {
         console.log("Error:", error);
@@ -74,7 +80,7 @@ export default function LoginScreen() {
       setIsLoading(false); // End loading state after API call is completed
     }
   };
-
+  
   return (
     <Flex
       minH={'100vh'}
@@ -93,8 +99,8 @@ export default function LoginScreen() {
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               <FormControl id="identifier" isRequired>
-                <FormLabel>{isUsingEmail ? 'Email address' : 'Username'}</FormLabel>
-                <Input type={isUsingEmail ? 'email' : 'text'} value={identifier} onChange={handleIdentifierChange} />
+                <FormLabel>{'Email address or Username'}</FormLabel>
+                <Input type={'text'} value={identifier} onChange={handleIdentifierChange} />
               </FormControl>
               <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>

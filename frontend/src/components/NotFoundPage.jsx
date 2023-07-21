@@ -1,29 +1,31 @@
-import { Box, Button, Center, Heading } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Box, Heading, Text, Button, Link } from '@chakra-ui/react';
 
-const NotFoundPage = () => {
+export default function NotFoundPage() {
   return (
-    <Box className="full img3">
-      <Center>
-        <Box className="row full">
-          <Box className="col center bg-white">
-            <Box>
-              <Heading as="h3" color="red.500" mb={2}>
-                404 :(
-              </Heading>
-              <Heading as="h3" mb={2}>
-                Page not found
-              </Heading>
-              <Button as={Link} to="/home" variant="link" mt={2}>
-                Go back to Homepage
-              </Button>
-            </Box>
-          </Box>
-          <Box className="col"></Box>
-        </Box>
-      </Center>
+    <Box textAlign="center" py={10} px={6}>
+      <Heading
+        display="inline-block"
+        as="h2"
+        size="2xl"
+        bgGradient="linear(to-r, teal.400, teal.600)"
+        backgroundClip="text">
+        404
+      </Heading>
+      <Text fontSize="18px" mt={3} mb={2}>
+        Page Not Found
+      </Text>
+      <Text color={'gray.500'} mb={6}>
+        The page you're looking for does not seem to exist
+      </Text>
+
+      <Button
+        colorScheme="teal"
+        bgGradient="linear(to-r, teal.400, teal.500, teal.600)"
+        color="white"
+        variant="solid">
+        <Link href={'/home'}>Go to Home</Link>
+        
+      </Button>
     </Box>
   );
-};
-
-export default NotFoundPage;
+}

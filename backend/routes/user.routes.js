@@ -4,6 +4,7 @@ const userController = require('../controllers/user.controller');
 const authenticate = require('../middlewares/auth.middelware');
 const user = require('../models/user.model');
 //user controller
+router.get('/',authenticate,userController.getUser);
 router.post('/signup', userController.signupUser);
 
 //user controller
@@ -26,7 +27,6 @@ router.get('/getAllUsernames', userController.getAllUsernames);
 
 //get user info by username
 router.post('/getUserInfo', userController.getUserInfo);
-
 // router.post('/save-settings',);
 //All related to code-environment
 
@@ -35,7 +35,7 @@ router.post('/getUserInfo', userController.getUserInfo);
 
 //code controller add middleware for auth
 // router.delete('/delete-code/:id',);
-router.delete('/users', async (req, res) => {
+router.delete('/', async (req, res) => {
   try {
     // Delete all users
     await user.deleteMany();
@@ -44,6 +44,9 @@ router.delete('/users', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting users.' });
   }
 });
-router.post('/users/:username/verifyemail', userController.verifyEmail);
+router.post('/:username/verifyemail', userController.verifyEmail);
+
+router.get('/:username/codeforces', userController.getCodeforcesData);
+router.get('/:username/leetcode', userController.getLeetcodeData);
 
 module.exports = router;

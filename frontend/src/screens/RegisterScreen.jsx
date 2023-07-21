@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Flex,
   Box,
@@ -14,7 +15,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 
@@ -22,11 +22,15 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
-    firstName: '',
-    lastName: '',
+    firstname: '',
+    lastname: '',
     email: '',
     password: '',
-    method:'local',
+    method: 'local',
+    handles: {
+      leetcodeHandle: '',
+      codeforcesHandle: '',
+    },
   });
   const [isLoading, setIsLoading] = useState(false);
   const [backendError, setBackendError] = useState('');
@@ -34,48 +38,51 @@ export default function RegisterScreen() {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [id]: value,
-    }));
+    if (id === 'leetcodeHandle' || id === 'codeforcesHandle') {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        handles: {
+          ...prevFormData.handles,
+          [id]: value,
+        },
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [id]: value,
+      }));
+    }
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setBackendError('');
-  
-    // Validate form fields
-    const { username, firstName, email, password } = formData;
-    if (!username || !firstName || !email || !password) {
+
+    const { username, firstname, email, password, handles } = formData;
+    if (!username || !firstname || !email || !password) {
       setBackendError('Please fill in all required fields.');
       setIsLoading(false);
       return;
     }
-  
+
     try {
-      const response = await axios.post('http://localhost:4000/auth/signup', formData);
-      console.log(response);
+      const response = await axios.post('http://localhost:4000/users/signup', formData);
       if (response.status === 200) {
         setVerificationEmailSent(true);
-      } 
-      else if(response.status === 409)
-      {
+      } else if (response.status === 409) {
         setBackendError(response.err);
       }
     } catch (error) {
-      console.log(error)
       if (error.response && error.response.data && error.response.data.err) {
         setBackendError(error.response.data.err);
-      }
-      else {
+      } else {
         setBackendError('An error occurred. Please try again.');
       }
     }
     setIsLoading(false);
   };
-  
+
   return (
     <Flex
       minH={'100vh'}
@@ -107,15 +114,15 @@ export default function RegisterScreen() {
             </Box>
             <HStack>
               <Box>
-                <FormControl id="firstName" isRequired>
+                <FormControl id="firstname" isRequired>
                   <FormLabel>First Name</FormLabel>
-                  <Input type="text" id="firstName" onChange={handleChange} />
+                  <Input type="text" id="firstname" onChange={handleChange} />
                 </FormControl>
               </Box>
               <Box>
-                <FormControl id="lastName">
+                <FormControl id="lastname">
                   <FormLabel>Last Name</FormLabel>
-                  <Input type="text" id="lastName" onChange={handleChange} />
+                  <Input type="text" id="lastname" onChange={handleChange} />
                 </FormControl>
               </Box>
             </HStack>
@@ -140,6 +147,14 @@ export default function RegisterScreen() {
                   </Button>
                 </InputRightElement>
               </InputGroup>
+            </FormControl>
+            <FormControl id="leetcodeHandle">
+              <FormLabel>LeetCode Handle</FormLabel>
+              <Input type="text" id="leetcodeHandle" onChange={handleChange} />
+            </FormControl>
+            <FormControl id="codeforcesHandle">
+              <FormLabel>Codeforces Handle</FormLabel>
+              <Input type="text" id="codeforcesHandle" onChange={handleChange} />
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button

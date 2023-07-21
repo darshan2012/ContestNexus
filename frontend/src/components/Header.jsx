@@ -38,7 +38,7 @@ const NavLink = ({ children, to }) => (
   </Link>
 );
 
-export default function Header() {
+export default function Header({user}) {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoggedIn,setIsLoggedIn] = useState(!!localStorage.getItem('token'));
@@ -76,7 +76,7 @@ export default function Header() {
             <Button onClick={toggleColorMode}>
               {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             </Button>
-            {isLoggedIn ? (
+            {user ? (
               <Menu>
                 <MenuButton
                   as={Button}
@@ -98,11 +98,10 @@ export default function Header() {
                     />
                   </Center>
                   <Center>
-                    <p>Username</p>
+                    <p>{user.username}</p>
                   </Center>
                   <MenuDivider />
-                  <MenuItem>Your Servers</MenuItem>
-                  <MenuItem>Account Settings</MenuItem>
+                  <Link to={'/userprofile'}><MenuItem>Account Settings</MenuItem></Link>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
               </Menu>

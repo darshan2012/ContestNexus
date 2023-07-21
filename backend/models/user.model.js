@@ -7,7 +7,7 @@ let userSchema = new Schema({
         unique:true,
         required: true
     },
-    firsname: {
+    firstname: {
         type: String,
         default: ''
     },
@@ -56,6 +56,10 @@ let userSchema = new Schema({
         mode: String,
         theme: String,
         code: String
+    },
+    handles: {
+        leetcodeHandle: String,
+        codeforcesHandle: String,
     }
 }, {
     collection: 'users'

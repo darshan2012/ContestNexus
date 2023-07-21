@@ -16,7 +16,7 @@ const EmailVerifyScreen = () => {
 		const verifyEmailUrl = async () => {
 			try {
 				console.log(param);
-				const url = `http://localhost:4000/auth/users/${param.username}/verifyemail`;
+				const url = `http://localhost:4000/users/${param.username}/verifyemail`;
 				const { data } = await axios.post(url,{token:param.token});
 				console.log(data);
 				setValidUrl(true);
@@ -26,7 +26,7 @@ const EmailVerifyScreen = () => {
 			}
 		};
 		verifyEmailUrl();
-	}, [param]);
+	}, );
 
 	return (
 		<Fragment>
