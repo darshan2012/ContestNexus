@@ -51,7 +51,7 @@ export default function Hero() {
             Explore Contests
           </Button>
           </Link>
-          <Button
+          {/* <Button
             colorScheme={'green'}
             bg={'green.500'}
             rounded={'full'}
@@ -61,7 +61,7 @@ export default function Hero() {
             }}
           >
             Join the Discussion
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
     </Container>

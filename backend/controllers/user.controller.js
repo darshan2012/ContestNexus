@@ -238,7 +238,8 @@ exports.updateUser = async (req, res) => {
 }
 
 exports.getUserInfo = async (req, res) => {
-    const { username } = req.body;
+    const username = req.params.username;
+    console.log(username);
     try {
         let user = await userSchema.findOne({ username: username });
         if (!user) {
@@ -249,8 +250,8 @@ exports.getUserInfo = async (req, res) => {
             'bio': user.bio,
             'email': user.email
         };
-        JSON.parse(JSON.stringify(data));
-        return sendResponse(data, res);
+        JSON.parse(JSON.stringify(user));
+        return sendResponse(user, res);
     } catch (err) {
         return sendResponse(err, res, 500);
     }
@@ -273,13 +274,15 @@ exports.getLeetcodeData = async (req, res) => {
     const username = req.params.username;
     const user = await userSchema.findOne({ username: username });
     if (user) {
-        const handle = user.handles.leetcodeHandle; // Replace with the desired Codeforces username
+        
+        var handle = user.handles.leetcodeHandle; // Replace with the desired Codeforces username
+        console.log(handle)
         if (handle) {
             try {
                 // Fetch user's Codeforces data
                 const query = `
                 {
-                  matchedUser(username: "${username}") {
+                  matchedUser(username: "${handle}") {
                     username
                     submitStats: submitStatsGlobal {
                       acSubmissionNum {
@@ -293,7 +296,7 @@ exports.getLeetcodeData = async (req, res) => {
               `;
 
                 const response = await axios.post('https://leetcode.com/graphql', { query });
-                const leetCodeData = response.data.data.matchedUser;
+                const leetCodeData = response.data.data.matchedUser.submitStats.acSubmissionNum;
 
                 sendResponse(leetCodeData, res, 200);
             } catch (error) {
@@ -319,7 +322,7 @@ exports.getCodeforcesData = async (req, res) => {
                 // Fetch user's Codeforces data
                 const response = await axios.get(`https://codeforces.com/api/user.info?handles=${handle}`);
                 const codeforcesData = response.data.result[0];
-                console.log(userInfo)
+                // console.log(userInfo)
 
                 sendResponse(codeforcesData, res, 200);
 

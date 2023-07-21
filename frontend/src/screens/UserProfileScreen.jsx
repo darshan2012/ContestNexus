@@ -1,118 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { useColorMode, Box, Heading, Text, Button, Icon } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { FaCode } from 'react-icons/fa';
+import { Link, Box, Text, Avatar, Center, Stack, HStack } from '@chakra-ui/react';
+import { useParams } from 'react-router-dom';
 
 const UserProfileScreen = () => {
-    const { colorMode, toggleColorMode } = useColorMode();
-    const [userProfile, setUserProfile] = useState({});
-    const [recentBlogs, setRecentBlogs] = useState([]);
-    const [leetCodeData, setLeetCodeData] = useState({});
+    const [userData, setUserData] = useState(null);
+    const [leetcodeData, setLeetcodeData] = useState(null);
+    const params = useParams();
 
-    const axiosInstance = axios.create({
-        baseURL: 'https://leetcode.com/graphql',
-        withCredentials: true, // Set this option to true to enable CORS requests with credentials
-      });
-      
+    // Fetch user data from the backend API
     useEffect(() => {
-        // Fetch user profile data from the backend and set it to userProfile state
-        axios.get('http://localhost:4000/user/profile').then((response) => {
-            setUserProfile(response.data);
-        });
-
-        // Fetch user's recent blogs from the backend and set them to recentBlogs state
-        axios.get('http://localhost:4000/blogs/recent').then((response) => {
-            setRecentBlogs(response.data);
-        });
-
-        const query = `
-      {
-        matchedUser(username: "darshanparmar200d") {
-          username
-          submitStats: submitStatsGlobal {
-            acSubmissionNum {
-              difficulty
-              count
-              submissions
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/users/${params.username}`);
+                const leetcode = await axios.get(`http://localhost:4000/users/${params.username}/leetcode`);
+                setLeetcodeData(leetcode.data.result); // Update to use leetcode.data directly
+                console.log(leetcode)
+                setUserData(response.data.result);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
             }
-          }
-        }
-      }
-    `;
+        };
 
-    axiosInstance
-            .post('https://leetcode.com/graphql', { query })
-            .then((response) => {
-                setLeetCodeData(response.data.data.matchedUser);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }, []);
+        fetchUserData();
+    }, [params.username]);
 
-    // Function to handle dark/light mode toggling
-    const handleModeToggle = () => {
-        toggleColorMode();
-    };
+    if (!userData || !leetcodeData) {
+        return <div>Loading...</div>;
+    }
+
+    const { leetcodeHandle, codeforcesHandle } = userData.handles || {};
 
     return (
-        <Box p={4}>
-            <Heading as="h1" size="xl">
-                User Profile
-            </Heading>
-
-            {/* Display user's profile information */}
-            <Text>Username: {userProfile.username}</Text>
-            <Text>First Name: {userProfile.firstname}</Text>
-            <Text>Last Name: {userProfile.lastname}</Text>
-            <Text>Bio: {userProfile.bio}</Text>
-
-            {/* Display the option to choose preferred mode */}
-            <Button onClick={handleModeToggle}>
-                {colorMode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-            </Button>
-
-            {/* Display user's recent blogs */}
-            <Heading as="h2" size="lg" mt={4}>
-                Recent Blogs
-            </Heading>
-            {/* {recentBlogs && recentBlogs.map((blog) => (
-            <Box key={blog.id} p={2} border="1px solid" borderColor="gray.200" mt={2}>
-            <Text fontSize="lg" fontWeight="bold">
-                {blog.title}
-            </Text>
-            <Text>{blog.content}</Text>
-            </Box>
-        ))} */}
-            <Heading as="h2" size="lg" mt={4}>
-                LeetCode Profile
-            </Heading>
-            <Box p={2} border="1px solid" borderColor="gray.200" mt={2}>
-                <Text fontSize="lg" fontWeight="bold">
-                    Username: {leetCodeData.username}
+        <Box>
+            <Box p={4} boxShadow="md" maxW="500px" mx="auto">
+                <Center>
+                    <Avatar size="xl" name={userData.firstname} />
+                </Center>
+                <Text mt={4} fontSize="xl" fontWeight="bold" textAlign="center">
+                    {userData.firstname} {userData.lastname}
                 </Text>
-                <Text>Reputation: {leetCodeData.reputation}</Text>
-                <Link href={`https://leetcode.com/${leetCodeData.username}`} isExternal>
-                    View Profile on LeetCode <Icon as={FaCode} />
-                </Link>
-            </Box>
-
-            {/* Display Codeforces profile data */}
-            {/* <Heading as="h2" size="lg" mt={4}>
-                Codeforces Profile
-            </Heading>
-            <Box p={2} border="1px solid" borderColor="gray.200" mt={2}>
-                <Text fontSize="lg" fontWeight="bold">
-                    Handle: {codeforcesData.handle}
+                <Text mt={2} fontSize="md" textAlign="center">
+                    Username: {userData.username}
                 </Text>
-                <Text>Rating: {codeforcesData.rating}</Text>
-                <Link href={`https://codeforces.com/profile/${codeforcesData.handle}`} isExternal>
-                    View Profile on Codeforces <Icon as={FaGithub} />
-                </Link>
-            </Box> */}
-    </Box >
-  );
+                <Text mt={2} fontSize="md" textAlign="center">
+                    Email: {userData.email}
+                </Text>
+                <Text mt={2} fontSize="md" textAlign="center">
+                    Bio: {userData.bio || 'No bio available'}
+                </Text>
+                <Text mt={2} fontSize="md" textAlign="center">
+                    LeetCode Handle: {leetcodeHandle ? <Link href={`https://leetcode.com/${leetcodeHandle}`} isExternal>{leetcodeHandle}</Link> : 'Not available'}
+                </Text>
+                <Text mt={2} fontSize="md" textAlign="center">
+                    Codeforces Handle: {codeforcesHandle ? <Link href={`https://codeforces.com/profile/${codeforcesHandle}`} isExternal>{codeforcesHandle}</Link> : 'Not available'}
+                </Text>
+            </Box>
+            <Text fontSize="lg" fontWeight="bold" textAlign="center">
+                        LeetCode Data
+                    </Text>
+            {leetcodeData && leetcodeData.length > 0 && (
+                <HStack spacing={4} mt={4} justify="center"> {/* Add `justify="center"` to center align the items */}
+                    
+                    {leetcodeData.map((item, index) => (
+                        <Box key={index} p={2} borderRadius="md" boxShadow="md">
+                            <Text fontSize="md">
+                                <strong>Difficulty:</strong> {item.difficulty}
+                            </Text>
+                            <Text fontSize="md">
+                                <strong>Count:</strong> {item.count}
+                            </Text>
+                            <Text fontSize="md">
+                                <strong>Submissions:</strong> {item.submissions}
+                            </Text>
+                        </Box>
+                    ))}
+                </HStack>
+            )}
+
+        </Box>
+    );
 };
 
 export default UserProfileScreen;

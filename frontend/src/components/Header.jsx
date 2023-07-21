@@ -47,6 +47,7 @@ export default function Header({user}) {
     // Perform logout logic and remove the JWT token from local storage
     localStorage.removeItem('token');
     setIsLoggedIn(false);
+    user = null;
   };
 
   return (
@@ -86,22 +87,27 @@ export default function Header({user}) {
                   minW={0}
                 >
                   <Avatar
-                    size={'sm'}
-                    src={'https://avatars.dicebear.com/api/male/username.svg'}
+                    size={{
+                      // sm:'sm',
+                      md:'md'}}
+                    name={user.firstname}
+                    colorScheme='coffee'
+                    // src={'https://avatars.dicebear.com/api/male/username.svg'}
                   />
                 </MenuButton>
                 <MenuList alignItems={'center'}>
                   <Center>
                     <Avatar
                       size={'2xl'}
-                      src={'https://avatars.dicebear.com/api/male/username.svg'}
+                      name={user.firstname}
+                      // src={'https://avatars.dicebear.com/api/male/username.svg'}
                     />
                   </Center>
                   <Center>
                     <p>{user.username}</p>
                   </Center>
                   <MenuDivider />
-                  <Link to={'/userprofile'}><MenuItem>Account Settings</MenuItem></Link>
+                  <Link to={'/'+user.username+'/userprofile'}><MenuItem>Account Settings</MenuItem></Link>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
               </Menu>

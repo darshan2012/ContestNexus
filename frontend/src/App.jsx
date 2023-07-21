@@ -63,7 +63,7 @@ function App() {
             <Route path="/users/register" element={<RegisterScreen />} />
             <Route path="/contests" element={<ContestScreen />} />
             
-            <Route path='/userprofile' element={<UserProfileScreen />}/>
+            <Route path='/:username/userprofile' element={<UserProfileScreen />}/>
             <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen />} />
             <Route path='/404' element={<NotFoundPage />} />
             <Route path='/*' element={<RedirectTO404 />} />

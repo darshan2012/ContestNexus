@@ -6,7 +6,6 @@ const user = require('../models/user.model');
 //user controller
 router.get('/',authenticate,userController.getUser);
 router.post('/signup', userController.signupUser);
-
 //user controller
 
 //user controller
@@ -46,7 +45,9 @@ router.delete('/', async (req, res) => {
 });
 router.post('/:username/verifyemail', userController.verifyEmail);
 
-router.get('/:username/codeforces', userController.getCodeforcesData);
+router.get('/:username',userController.getUserInfo);
 router.get('/:username/leetcode', userController.getLeetcodeData);
+router.get('/:username/codeforces', userController.getCodeforcesData);
+
 
 module.exports = router;
