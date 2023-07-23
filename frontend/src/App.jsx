@@ -14,6 +14,7 @@ import NotFoundPage from './components/NotFoundPage';
 import axios from 'axios';
 import RedirectTO404 from './components/RedirectTO404';
 import UserProfileScreen from './screens/UserProfileScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
 
 function App() {
   
@@ -34,7 +35,7 @@ function App() {
           },
         })
         .then((response) => {
-          console.log(response);
+          console.log(response.data.result);
           // Update the user data state with the fetched data
           setUserData(response.data.result);
         })
@@ -54,7 +55,7 @@ function App() {
       {/* <IDEScreen /> */}
       <ChakraProvider>
         <Router>
-          {!isPageNotFound && (!showLogo ? <Header user={userData}/> : <Box float={'left'} ><LogoLink href={"/home"}><h1>logo</h1></LogoLink></Box>)}
+          {!isPageNotFound && (!showLogo ? <Header user={userData}/> : <Box float={'left'} ><LogoLink href={"/home"}><h1>ContestNexus</h1></LogoLink></Box>)}
           {/* <UserComponent /> */}
           <Routes>
             <Route path="/" element={<HomeScreen />} />
@@ -62,7 +63,7 @@ function App() {
             <Route path="/users/login" element={<LoginScreen />} />
             <Route path="/users/register" element={<RegisterScreen />} />
             <Route path="/contests" element={<ContestScreen />} />
-            
+            <Route path="/:username/editprofile" element={<EditProfileScreen />} />
             <Route path='/:username/userprofile' element={<UserProfileScreen />}/>
             <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen />} />
             <Route path='/404' element={<NotFoundPage />} />

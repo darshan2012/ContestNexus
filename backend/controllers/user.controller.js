@@ -222,14 +222,16 @@ exports.resetPassword = async (req, res) => {
 
 
 exports.updateUser = async (req, res) => {
-    const { username, fullname, bio } = req.body;
     try {
-        let user = await userSchema.findOne({ username: username });
+        let user = await userSchema.findOne({ username: req.params.username });
+        const { firstname, lastname, bio,handles } = req.body;
         if (!user) {
             return sendResponse("User with this username does not exist!", res, 404);
         }
-        user.fullName = fullname;
+        user.firstname = firstname;
+        user.lastname = lastname;
         user.bio = bio;
+        user.handles = handles;
         await user.save();
         return sendResponse(user, res);
     } catch (err) {
@@ -239,7 +241,7 @@ exports.updateUser = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
     const username = req.params.username;
-    console.log(username);
+    // console.log(username);
     try {
         let user = await userSchema.findOne({ username: username });
         if (!user) {
@@ -276,7 +278,7 @@ exports.getLeetcodeData = async (req, res) => {
     if (user) {
         
         var handle = user.handles.leetcodeHandle; // Replace with the desired Codeforces username
-        console.log(handle)
+        // console.log(handle)
         if (handle) {
             try {
                 // Fetch user's Codeforces data
@@ -318,18 +320,18 @@ exports.getCodeforcesData = async (req, res) => {
     if (user) {
         const handle = user.handles.codeforcesHandle; // Replace with the desired Codeforces username
         if (handle) {
-            try {
-                // Fetch user's Codeforces data
-                const response = await axios.get(`https://codeforces.com/api/user.info?handles=${handle}`);
-                const codeforcesData = response.data.result[0];
-                // console.log(userInfo)
+            try{
+                const response = await axios.get(`https://codeforces.com/api/user.status?handle=${handle}`);
+                const codeforcesData = processData(response.data.result);
+                codeforcesData.handle = handle;
 
-                sendResponse(codeforcesData, res, 200);
+                sendResponse(codeforcesData ,res,200);
 
-
-            } catch (error) {
-                console.error(error);
-                sendResponse('An error occurred while fetching data from Codeforces API', res, 500);
+            }
+            catch(error)
+            {
+                console.error(error.message);
+                sendResponse('An error occurred while fetching data from Codeforces API', res, error.status);
             }
         }
         else
@@ -350,3 +352,99 @@ exports.deleteCode = async (req, res) => {
 exports.saveConfig = async (req, res) => {
 
 }
+function processData(result) {
+    const problems = {};
+    const tags = {};
+    const levels = {};
+    const ratings = {};
+    const verdicts = {};
+    const langs = {};
+    const heatmap = {};
+    let totalSub = 0;
+    let years = 0;
+  
+    for (var i = result.length - 1; i >= 0; i--) {
+      var sub = result[i];
+      var rating = sub.problem.rating === undefined ? 0 : sub.problem.rating;
+      var problemId = sub.problem.contestId + '-' + sub.problem.name + '-' + rating;
+      var problemIdprev = sub.problem.contestId - 1 + '-' + sub.problem.name + '-' + rating;
+      var problemIdnext = sub.problem.contestId + 1 + '-' + sub.problem.name + '-' + rating;
+  
+      if (problems[problemIdprev] !== undefined) {
+        if (problems[problemIdprev].solved === 0) {
+          problems[problemIdprev].attempts++;
+        }
+        problemId = problemIdprev;
+      } else if (problems[problemIdnext] !== undefined) {
+        if (problems[problemIdnext].solved === 0) {
+          problems[problemIdnext].attempts++;
+        }
+        problemId = problemIdnext;
+      } else if (problems[problemId] !== undefined) {
+        if (problems[problemId].solved === 0) {
+          problems[problemId].attempts++;
+        }
+      } else {
+        problems[problemId] = {
+          problemlink: sub.contestId + '-' + sub.problem.index,
+          attempts: 1,
+          solved: 0
+        };
+      }
+  
+      if (sub.verdict == 'OK') {
+        problems[problemId].solved++;
+      }
+  
+      if (problems[problemId].solved === 1 && sub.verdict == 'OK') {
+        sub.problem.tags.forEach(function (t) {
+          if (tags[t] === undefined) tags[t] = 1;
+          else tags[t]++;
+        });
+  
+        if (levels[sub.problem.index[0]] === undefined)
+          levels[sub.problem.index[0]] = 1;
+        else levels[sub.problem.index[0]]++;
+  
+        if (sub.problem.rating) {
+          if (ratings[sub.problem.rating] === undefined) {
+            ratings[sub.problem.rating] = 1;
+          } else {
+            ratings[sub.problem.rating]++;
+          }
+        }
+      }
+  
+      if (verdicts[sub.verdict] === undefined) verdicts[sub.verdict] = 1;
+      else verdicts[sub.verdict]++;
+  
+      if (langs[sub.programmingLanguage] === undefined)
+        langs[sub.programmingLanguage] = 1;
+      else langs[sub.programmingLanguage]++;
+  
+      var date = new Date(sub.creationTimeSeconds * 1000);
+      date.setHours(0, 0, 0, 0);
+      if (heatmap[date.valueOf()] === undefined) heatmap[date.valueOf()] = 1;
+      else heatmap[date.valueOf()]++;
+      totalSub = result.length;
+  
+      years =
+        new Date(result[0].creationTimeSeconds * 1000).getYear() -
+        new Date(result[result.length - 1].creationTimeSeconds * 1000).getYear();
+      years = Math.abs(years) + 1;
+    }
+  
+    // Return the processed data as an object
+    return {
+      problems,
+      tags,
+      levels,
+      ratings,
+      verdicts,
+      langs,
+      heatmap,
+      totalSub,
+      years,
+    };
+  }
+  

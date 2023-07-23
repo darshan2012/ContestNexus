@@ -61,7 +61,7 @@ export default function Header({user}) {
           onClick={isOpen ? onClose : onOpen}
         />
         <HStack spacing={8} alignItems={'center'}>
-          <Link to="/">Logo</Link>
+          <Link to="/">ContestNexus</Link>
           <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
             
               <NavLink to="/home">Home</NavLink>
@@ -108,6 +108,7 @@ export default function Header({user}) {
                   </Center>
                   <MenuDivider />
                   <Link to={'/'+user.username+'/userprofile'}><MenuItem>Account Settings</MenuItem></Link>
+                  <Link to={'/'+user.username+'/editprofile'}><MenuItem>Edit Profile</MenuItem></Link>
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
               </Menu>

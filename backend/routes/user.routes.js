@@ -19,7 +19,7 @@ router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 
 //user controller add middleware for auth
-router.put('/update-profile', authenticate, userController.updateUser);
+router.put('/:username/update-profile', authenticate, userController.updateUser);
 
 //get all users
 router.get('/getAllUsernames', userController.getAllUsernames);

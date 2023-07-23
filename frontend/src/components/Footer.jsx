@@ -8,18 +8,20 @@ export default function Footer() {
       color={useColorModeValue('gray.700', 'gray.200')}
       position="fixed"
       // marginTop={5}
-      // alignItems={"Center"}
+      alignItems={"Center"}
       bottom={0}
       left={0}
       width="100%"
-      justifyContent={'space-around'}
+      height={"4VH"}
     >
 
-      
-      <Text fontWeight="bold" fontSize="xs">
+      <Flex gap={2} ms={"110px"} >
+        
+      <Text  fontWeight="bold" fontSize="md">
         Keep coding
       </Text>
-      <Icon as={FaHeart} color="red.500" boxSize={5} />
+      <Icon as={FaHeart}  color="dark.500" boxSize={5} />
+      </Flex>
 
     </Flex>
   );
