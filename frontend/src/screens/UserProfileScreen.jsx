@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import UserCodeforcesData from '../components/UserCodeforcesData';
-import UserLeetCodeData from './UserLeetcodeData';
+import UserLeetCodeData from '../components/UserLeetcodeData';
 
 const UserProfileScreen = () => {
     const [userData, setUserData] = useState(null);
@@ -35,6 +35,7 @@ const UserProfileScreen = () => {
             try {
                 const response = await axios.get(`http://localhost:4000/users/${params.username}`);
                 setUserData(response.data.result);
+
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -51,11 +52,11 @@ const UserProfileScreen = () => {
         );
     }
 
-    const { leetcodeHandle, codeforcesHandle } = userData.handles || {};
 
     const handleTabChange = (index) => {
         setSelectedTabIndex(index);
     };
+    const { leetcodeHandle, codeforcesHandle } = userData.handles || {};
 
     return (
         <Box>
@@ -108,28 +109,36 @@ const UserProfileScreen = () => {
                     </TabList>
                     <TabPanels mt={8}>
                         <TabPanel>
-                            <Box
-                                bg={isDarkMode ? 'gray.800' : 'white'}
-                                p={4}
-                                borderRadius="lg"
-                                boxShadow="lg"
-                                border="1px solid"
-                                borderColor={isDarkMode ? 'gray.600' : 'gray.200'}
-                            >
-                                <UserLeetCodeData username={params.username} />
-                            </Box>
+                            {leetcodeHandle ? ( // Conditional rendering based on the existence of leetcodeHandle
+                                <Box
+                                    bg={isDarkMode ? 'gray.800' : 'white'}
+                                    p={4}
+                                    borderRadius="lg"
+                                    boxShadow="lg"
+                                    border="1px solid"
+                                    borderColor={isDarkMode ? 'gray.600' : 'gray.200'}
+                                >
+                                    <UserLeetCodeData handle={leetcodeHandle} />
+                                </Box>
+                            ) : (
+                                <Text>No LeetCode handle available.</Text>
+                            )}
                         </TabPanel>
                         <TabPanel>
-                            <Box
-                                bg={isDarkMode ? 'gray.800' : 'white'}
-                                p={4}
-                                borderRadius="lg"
-                                boxShadow="lg"
-                                border="1px solid"
-                                borderColor={isDarkMode ? 'gray.600' : 'gray.200'}
-                            >
-                                <UserCodeforcesData username={params.username} />
-                            </Box>
+                            {codeforcesHandle ? ( // Conditional rendering based on the existence of codeforcesHandle
+                                <Box
+                                    bg={isDarkMode ? 'gray.800' : 'white'}
+                                    p={4}
+                                    borderRadius="lg"
+                                    boxShadow="lg"
+                                    border="1px solid"
+                                    borderColor={isDarkMode ? 'gray.600' : 'gray.200'}
+                                >
+                                    <UserCodeforcesData handle={codeforcesHandle} />
+                                </Box>
+                            ) : (
+                                <Text>No Codeforces handle available.</Text>
+                            )}
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

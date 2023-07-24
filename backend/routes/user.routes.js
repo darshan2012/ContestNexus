@@ -46,8 +46,7 @@ router.delete('/', async (req, res) => {
 router.post('/:username/verifyemail', userController.verifyEmail);
 
 router.get('/:username',userController.getUserInfo);
-router.get('/:username/leetcode', userController.getLeetcodeData);
-router.get('/:username/codeforces', userController.getCodeforcesData);
-
+router.get('/codeforces/:handle', userController.getCodeforcesData);
+router.get('/leetcode/:handle', userController.getLeetcodeData);
 
 module.exports = router;
