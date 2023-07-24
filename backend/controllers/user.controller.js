@@ -307,6 +307,8 @@ exports.getLeetcodeData = async (req, res) => {
     else
         sendResponse('handle does not exist', res, 404);
 }
+    
+
 
 exports.getCodeforcesData = async (req, res) => {
     const handle = req.params.handle; // Replace with the desired Codeforces username
@@ -317,6 +319,7 @@ exports.getCodeforcesData = async (req, res) => {
             codeforcesData.handle = handle;
 
             sendResponse(codeforcesData, res, 200);
+
         }
         catch (error) {
             console.error(error.message);

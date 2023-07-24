@@ -14,8 +14,9 @@ const UserLeetCodeData = ({ handle }) => {
       // Make a GET request to the Express backend endpoint
       axios.get(`http://localhost:4000/users/leetcode/${handle}`)
         .then(response => {
+          // console.log(response.data.result)
           setLeetcodeData(response.data.result);
-          setNotfound(false);
+          // setNotfound(false);
         })
         .catch(error => {
           // console.log(error.response.status)
@@ -49,23 +50,16 @@ const UserLeetCodeData = ({ handle }) => {
   }
 
   // Filter "All" difficulty data
-  const allDifficulty ={};
-  const otherDifficulties = {};
+  const allDifficulty = leetcodeData.find(item => item.difficulty === 'All');
+  const otherDifficulties = leetcodeData.filter(item => item.difficulty !== 'All');
 
   // Data for Bar Chart
 
-  let chartData;
-  if (!nofound) {
-    const allDifficulty = leetcodeData.find(item => item.difficulty === 'All');
-    const otherDifficulties = leetcodeData.filter(item => item.difficulty !== 'All');
-
-    // Data for Bar Chart
-
-    const chartData = [
-      ["Difficulty", "Count", "Submissions"],
-      ...otherDifficulties.map(item => [item.difficulty, item.count, item.submissions]),
-    ];
-  }
+  const chartData = [
+    ["Difficulty", "Count", "Submissions"],
+    ...otherDifficulties.map(item => [item.difficulty, item.count, item.submissions]),
+  ];
+  
   return (
     <Box width={"100%"} p={4} >
       <Heading fontWeight="bold">LeetCode Data</Heading>
