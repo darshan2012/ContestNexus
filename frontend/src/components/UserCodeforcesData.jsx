@@ -20,15 +20,17 @@ const UserCodeforcesData = ({ handle }) => {
   const [nofound,setNotfound] = useState(false);
   useEffect(() => {
     // Make a GET request to the Express backend endpoint
-    axios.get(`http://localhost:4000/users/${username}/codeforces`)
+    axios.get(`http://localhost:4000/users/codeforces/${handle}`)
       .then(response => {
         // console.log("called");
         setCodeforcesData(response.data.result)
       })
       .catch(error => {
+        setNotfound(true);
+        setCodeforcesData(null);
         console.error('Error fetching data:', error);
       });
-  }, [username]);
+  }, [handle]);
   
     
   if (nofound) {
@@ -52,7 +54,7 @@ const UserCodeforcesData = ({ handle }) => {
     );
   }
 
-  const { tags, levels, verdicts, ratings, langs, heatmap, handle } = codeforcesData;
+  const { tags, levels, verdicts, ratings, langs, heatmap } = codeforcesData;
 
   // Extract data for charts
   const getRandomColor = () => {
