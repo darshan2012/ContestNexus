@@ -35,6 +35,6 @@ const authRoute = require('./routes/user.routes');
 const blogRoute = require('./routes/blog.routes');
 
 // app.use('/api/code', codeRoute);
-app.use('/api/blog', blogRoute);
+app.use('/blogs', blogRoute);
 app.use('/users', authRoute);
 app.use('/', (_req, res) => res.status.send('Backend is alive !!'));

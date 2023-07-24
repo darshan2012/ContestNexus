@@ -36,7 +36,7 @@ function App() {
           },
         })
         .then((response) => {
-          console.log(response.data.result);
+          // console.log(response.data.result);
           // Update the user data state with the fetched data
           setUserData(response.data.result);
         })
@@ -62,7 +62,7 @@ function App() {
   useEffect(() => {
 
     window.addEventListener('popstate', handleBackButton);
-    
+
     return () => {
       // Cleanup the event listener when the component unmounts
       window.removeEventListener('popstate', handleBackButton);

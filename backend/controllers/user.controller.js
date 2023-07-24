@@ -322,8 +322,9 @@ exports.getCodeforcesData = async (req, res) => {
 
         }
         catch (error) {
+            // console.log(error)
             console.error(error.message);
-            sendResponse('An error occurred while fetching data from Codeforces API', res, error.status);
+            sendResponse('An error occurred while fetching data from Codeforces API', res, 500);
         }
     }
     else
