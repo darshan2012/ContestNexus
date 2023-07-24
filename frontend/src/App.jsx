@@ -15,13 +15,14 @@ import axios from 'axios';
 import RedirectTO404 from './components/RedirectTO404';
 import UserProfileScreen from './screens/UserProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
+import SeachCoderScreen from './screens/SeachCoderScreen';
 
 function App() {
-  
+
   const [userData, setUserData] = useState(null);
   const location = window.location.pathname;
   const isPageNotFound = location.includes('/404'); // State variable for 404 Not Found
-  const showLogo = location.includes('/users/');
+  const [showLogo,setShowlogo] = useState(location.includes('/users/'))
 
   useEffect(() => {
     // Check if the token exists in the local storage
@@ -46,8 +47,28 @@ function App() {
     }
   }, []);
 
+  const handleBackButton = () => {
+    if (url.includes('users')) {
+      // The URL contains 'login', do something here (e.g., redirect, show a message, etc.)
+      // console.log('URL contains "login"');
+      showLogo = true
+    } else {
+      showLogo = false
+    }
+  }
 
-  
+
+
+  useEffect(() => {
+
+    window.addEventListener('popstate', handleBackButton);
+    
+    return () => {
+      // Cleanup the event listener when the component unmounts
+      window.removeEventListener('popstate', handleBackButton);
+    };
+
+  },[showLogo])
 
   // console.log(isEmailVerifyScreen);
   return (
@@ -55,7 +76,7 @@ function App() {
       {/* <IDEScreen /> */}
       <ChakraProvider>
         <Router>
-          {!isPageNotFound && (!showLogo ? <Header user={userData}/> : <Box float={'left'} ><LogoLink href={"/home"}><h1>ContestNexus</h1></LogoLink></Box>)}
+          {!isPageNotFound && (!showLogo ? <Header user={userData} /> : <Box float={'left'} ><LogoLink href={"/home"}><h1>ContestNexus</h1></LogoLink></Box>)}
           {/* <UserComponent /> */}
           <Routes>
             <Route path="/" element={<HomeScreen />} />
@@ -63,8 +84,9 @@ function App() {
             <Route path="/users/login" element={<LoginScreen />} />
             <Route path="/users/register" element={<RegisterScreen />} />
             <Route path="/contests" element={<ContestScreen />} />
+            <Route path="/stalk" element={<SeachCoderScreen />} />
             <Route path="/:username/editprofile" element={<EditProfileScreen />} />
-            <Route path='/:username/userprofile' element={<UserProfileScreen />}/>
+            <Route path='/:username/userprofile' element={<UserProfileScreen />} />
             <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen />} />
             <Route path='/404' element={<NotFoundPage />} />
             <Route path='/*' element={<RedirectTO404 />} />

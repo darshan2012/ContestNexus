@@ -48,6 +48,7 @@ export default function Header({user}) {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     user = null;
+    window.location.reload();
   };
 
   return (
@@ -67,6 +68,8 @@ export default function Header({user}) {
               <NavLink to="/home">Home</NavLink>
             
             <NavLink to="/contests">Contests</NavLink>
+            <NavLink to="/stalk">SearchCoder</NavLink>
+            <NavLink to="http://localhost:3000">Code</NavLink>
             {/* <NavLink to="/about">About us</NavLink> */}
             {/* <NavLink to="/contact">Contact</NavLink> */}
           </HStack>
@@ -113,16 +116,19 @@ export default function Header({user}) {
                 </MenuList>
               </Menu>
             ) : (
-              <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
+              <Stack alignItems={'center'} flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
+                <Link to={'/users/login'}>
                 <Button
                   as={'a'}
                   fontSize={'sm'}
                   fontWeight={400}
                   variant={'link'}
-                  href={'users/login'}
-                >
+                  >
                   Sign In
                 </Button>
+                  </Link>
+                <Link to={'/users/register'}>
+                
                 <Button
                   as={'a'}
                   display={{ base: 'none', md: 'inline-flex' }}
@@ -130,13 +136,13 @@ export default function Header({user}) {
                   fontWeight={600}
                   color={'white'}
                   bg={'teal'}
-                  href={'users/register'}
                   _hover={{
                     bg: 'teal.300',
                   }}
-                >
+                  >
                   Sign Up
                 </Button>
+                  </Link>
               </Stack>
             )}
           </Stack>

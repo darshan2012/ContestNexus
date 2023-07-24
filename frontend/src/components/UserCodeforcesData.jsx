@@ -13,26 +13,45 @@ import {
 } from "@chakra-ui/react";
 import { Chart } from "react-google-charts";
 
-const UserCodeforcesData = ({ username }) => {
+const UserCodeforcesData = ({ handle }) => {
   const [codeforcesData, setCodeforcesData] = useState(null);
   const { colorMode } = useColorMode();
   const isDarkMode = colorMode === 'dark';
-
+  const [nofound,setNotfound] = useState(false);
   useEffect(() => {
-    // Make a GET request to the Express backend endpoint
-    axios.get(`http://localhost:4000/users/${username}/codeforces`)
-      .then(response => {
-        console.log("called");
-        setCodeforcesData(response.data.result)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, [username]);
+    console.log(" codeforces " + handle);
+    if(handle !== undefined && handle !== null)
+    {
+      // Make a GET request to the Express backend endpoint
+      axios.get(`http://localhost:4000/users/codeforces/${handle}`)
+        .then(response => {
+          console.log("called");
+          setCodeforcesData(response.data.result)
+        })
+        .catch(error => {
+          setNotfound(true);
+          console.error('Error fetching data:', error);
+          setCodeforcesData({});
+        });
+
+    }
+  }, [handle]);
   
     
+  if (nofound) {
+    return (
+      <Box p="4" w={"100%"}>
+        {/* <Heading fontWeight="bold" mb="4" color={isDarkMode ? 'white' : 'black'}>
+          Codeforces Data for {handle}
+        </Heading> */}
+        <Text fontSize="xl" fontWeight="bold" mb="4" color={isDarkMode ? 'gray.300' : 'black'}>
+          No data available for {handle} on Codeforces.
+        </Text>
+      </Box>
+    );
+  }
 
-  if (!codeforcesData) {
+  if (!codeforcesData || !handle) {
     return (
       <Center height="20vh">
         <Spinner size={'lg'} />
@@ -40,7 +59,7 @@ const UserCodeforcesData = ({ username }) => {
     );
   }
 
-  const { tags, levels, verdicts, ratings, langs, heatmap, handle } = codeforcesData;
+  const { tags, levels, verdicts, ratings, langs, heatmap } = codeforcesData&&!nofound?codeforcesData:{};
 
   // Extract data for charts
   const getRandomColor = () => {
@@ -54,6 +73,7 @@ const UserCodeforcesData = ({ username }) => {
 
   // Data for Bar Chart (submission levels)
   const levelsChartData = [
+    
     ["Element", "Solved", { role: "style" }],
     ...Object.entries(levels).map(([label, value]) => [label, value, getRandomColor()]),
   ];
