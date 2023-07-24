@@ -19,23 +19,16 @@ const UserCodeforcesData = ({ handle }) => {
   const isDarkMode = colorMode === 'dark';
   const [nofound,setNotfound] = useState(false);
   useEffect(() => {
-    console.log(" codeforces " + handle);
-    if(handle !== undefined && handle !== null)
-    {
-      // Make a GET request to the Express backend endpoint
-      axios.get(`http://localhost:4000/users/codeforces/${handle}`)
-        .then(response => {
-          setCodeforcesData(response.data.result)
-        })
-        .catch(error => {
-          // console.log(error.response.status)
-          setNotfound(true);
-          setCodeforcesData({});
-          console.error('Error fetching data:', error);
-        });
-
-    }
-  }, [handle]);
+    // Make a GET request to the Express backend endpoint
+    axios.get(`http://localhost:4000/users/${username}/codeforces`)
+      .then(response => {
+        // console.log("called");
+        setCodeforcesData(response.data.result)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, [username]);
   
     
   if (nofound) {
@@ -51,7 +44,7 @@ const UserCodeforcesData = ({ handle }) => {
     );
   }
 
-  if (codeforcesData == null && !codeforcesData || !handle) {
+  if (!codeforcesData) {
     return (
       <Center height="20vh">
         <Spinner size={'lg'} />
@@ -59,7 +52,7 @@ const UserCodeforcesData = ({ handle }) => {
     );
   }
 
-  const { tags, levels, verdicts, ratings, langs, heatmap } = codeforcesData;
+  const { tags, levels, verdicts, ratings, langs, heatmap, handle } = codeforcesData;
 
   // Extract data for charts
   const getRandomColor = () => {

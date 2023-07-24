@@ -57,18 +57,7 @@ function App() {
     }
   }
 
-
-
-  useEffect(() => {
-
-    window.addEventListener('popstate', handleBackButton);
-
-    return () => {
-      // Cleanup the event listener when the component unmounts
-      window.removeEventListener('popstate', handleBackButton);
-    };
-
-  },[showLogo])
+  
 
   // console.log(isEmailVerifyScreen);
   return (
