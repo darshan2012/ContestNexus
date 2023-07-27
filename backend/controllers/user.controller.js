@@ -164,13 +164,16 @@ exports.verifyEmail = async (req, res) => {
                     user.mailToken = '';
                     user.active = true;
                     await user.save();
+                    // console.log();
                     return sendResponse('Account Email Confirmed!', res);
                 }
+                
             return sendResponse('Account Activation Failed', res, 401);
         } else {
             return sendResponse('Invalid activation requested! Kindly follow url sent in mail!', res, 401);
         }
     } catch (err) {
+        // console.log(err);
         return sendResponse(err, res, 500);
     }
 

@@ -57,7 +57,7 @@ const UserProfileScreen = () => {
         setSelectedTabIndex(index);
     };
     const { leetcodeHandle, codeforcesHandle } = userData.handles || {};
-
+    
     return (
         <Box>
             <Box bg={isDarkMode ? 'gray.900' : 'gray.100'}>

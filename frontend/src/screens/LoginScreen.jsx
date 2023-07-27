@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Flex,
   Box,
@@ -15,7 +15,7 @@ import {
 import { Link, redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function LoginScreen() {
+export default function LoginScreen({showLogo,setShowlogo}) {
   const [identifier, setIdentifier] = useState('');
   const [method,setMethod] = useState('local');
   const [password, setPassword] = useState('');
@@ -24,6 +24,10 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUsingEmail, setIsUsingEmail] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    setShowlogo(true);
+  },[])
 
   const handleIdentifierChange = (e) => {
     setIdentifier(e.target.value);
@@ -65,6 +69,7 @@ export default function LoginScreen() {
       if (response.status === 200) {
         const token = response.data.result.token;
         localStorage.setItem('token', token);
+        setShowlogo(false);
         navigate('/');
         window.location.reload(); // This will force a page refresh
       }

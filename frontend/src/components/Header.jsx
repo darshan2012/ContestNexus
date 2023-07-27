@@ -41,7 +41,7 @@ const NavLink = ({ children, to }) => (
 export default function Header({user}) {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isLoggedIn,setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [isLoggedIn,setIsLoggedIn] = useState(user != undefined);
 
   const handleLogout = () => {
     // Perform logout logic and remove the JWT token from local storage

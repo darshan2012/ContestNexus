@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Flex,
   Box,
@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 
-export default function RegisterScreen() {
+export default function RegisterScreen({showLogo,setShowlogo}) {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -35,7 +35,9 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [backendError, setBackendError] = useState('');
   const [verificationEmailSent, setVerificationEmailSent] = useState(false);
-
+  useEffect(()=>{
+    setShowlogo(true);
+  },[])
   const handleChange = (e) => {
     const { id, value } = e.target;
     if (id === 'leetcodeHandle' || id === 'codeforcesHandle') {

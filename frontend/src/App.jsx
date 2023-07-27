@@ -16,15 +16,24 @@ import RedirectTO404 from './components/RedirectTO404';
 import UserProfileScreen from './screens/UserProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import SeachCoderScreen from './screens/SeachCoderScreen';
+import BlogList from './components/BlogList';
+import BlogDetails from './components/BlogDetails';
+import CreateBlog from './components/CreateBlog';
+import BlogScreen from './screens/BlogScreen';
+// import EditBlog from './components/EditBlog';
 
 function App() {
 
   const [userData, setUserData] = useState(null);
   const location = window.location.pathname;
   const isPageNotFound = location.includes('/404'); // State variable for 404 Not Found
-  const [showLogo,setShowlogo] = useState(location.includes('/users/'))
-
+  const [showLogo, setShowlogo] = useState(false);
+  
   useEffect(() => {
+    window.addEventListener('popstate', handleBackButton);
+
+    
+    setShowlogo(location.includes('users'));
     // Check if the token exists in the local storage
     const token = localStorage.getItem('token');
     if (token) {
@@ -45,19 +54,21 @@ function App() {
           // Handle any error during the API call
         });
     }
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    }
   }, []);
-
   const handleBackButton = () => {
-    if (url.includes('users')) {
+    if (location.includes('users')) {
       // The URL contains 'login', do something here (e.g., redirect, show a message, etc.)
       // console.log('URL contains "login"');
-      showLogo = true
+      setShowlogo(true)
     } else {
-      showLogo = false
+      setShowlogo(false)
     }
+
   }
 
-  
 
   // console.log(isEmailVerifyScreen);
   return (
@@ -70,13 +81,18 @@ function App() {
           <Routes>
             <Route path="/" element={<HomeScreen />} />
             <Route index path={"/home"} element={<HomeScreen />} />
-            <Route path="/users/login" element={<LoginScreen />} />
-            <Route path="/users/register" element={<RegisterScreen />} />
+            <Route path="/users/login" element={<LoginScreen showLogo={showLogo} setShowlogo={setShowlogo} />} />
+            <Route path="/users/register" element={<RegisterScreen showLogo={showLogo} setShowlogo={setShowlogo} />} />
             <Route path="/contests" element={<ContestScreen />} />
+            <Route exact path="/blogs/create" element={<CreateBlog />} />
+            <Route exact path="/blogs" element={<BlogScreen />} />
+            <Route exact path="/blogs/:id" element={<BlogDetails />} />
+            {/* <Route exact path="/blogs/edit/:id" component={EditBlog} /> */}
             <Route path="/stalk" element={<SeachCoderScreen />} />
             <Route path="/:username/editprofile" element={<EditProfileScreen />} />
             <Route path='/:username/userprofile' element={<UserProfileScreen />} />
-            <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen />} />
+            <Route path="/users/:username/verifyemail/:token" element={<EmailVerifyScreen showLogo={showLogo} setShowlogo={setShowlogo} />} />
+
             <Route path='/404' element={<NotFoundPage />} />
             <Route path='/*' element={<RedirectTO404 />} />
           </Routes>
