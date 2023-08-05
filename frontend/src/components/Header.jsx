@@ -68,8 +68,9 @@ export default function Header({user}) {
               <NavLink to="/home">Home</NavLink>
             
             <NavLink to="/contests">Contests</NavLink>
-            <NavLink to="/stalk">SearchCoder</NavLink>
+            <NavLink to="blogs">Blogs</NavLink>
             <NavLink to="http://localhost:3000">Code</NavLink>
+            <NavLink to="/stalk">SearchCoder</NavLink>
             {/* <NavLink to="/about">About us</NavLink> */}
             {/* <NavLink to="/contact">Contact</NavLink> */}
           </HStack>

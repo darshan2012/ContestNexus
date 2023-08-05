@@ -86,7 +86,7 @@ function App() {
             <Route path="/contests" element={<ContestScreen />} />
             <Route exact path="/blogs/create" element={<CreateBlog />} />
             <Route exact path="/blogs" element={<BlogScreen />} />
-            <Route exact path="/blogs/:id" element={<BlogDetails />} />
+            {/* <Route exact path="/blogs/:id" element={<BlogDetails />} /> */}
             {/* <Route exact path="/blogs/edit/:id" component={EditBlog} /> */}
             <Route path="/stalk" element={<SeachCoderScreen />} />
             <Route path="/:username/editprofile" element={<EditProfileScreen />} />
