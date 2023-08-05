@@ -20,8 +20,8 @@ const Google = async () => {
 
     // Set up the OAuth2.0 client with your credentials
     await gapi.client.init({
-      apiKey: "AIzaSyB7Bfx_vfiVj2MTpThrIP04BFt6dBlZodk",
-      clientId: "230439579935-5u3gdemap9uncs7oc8sd6qav98c8td8p.apps.googleusercontent.com",
+      apiKey: proccess.env.API_KEY,
+      clientId: process.env.CLIENT_ID,
       discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
       scope: "https://www.googleapis.com/auth/calendar.events",
     });
